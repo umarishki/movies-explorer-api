@@ -1,21 +1,23 @@
 const Movie = require('../models/movie');
+const NotFoundError = require('../errors/not-found-err');
+const DefaultError = require('../errors/default-err');
+const ValidationError = require('../errors/validation-err');
 
 const getSavedMovies = async (req, res, next) => {
-  req.user = { _id: '6315f9eb574ba0a73bd77e09' };
   try {
     const movies = await Movie.find({ owner: req.user._id });
     res.send(movies);
+    if (!movies) {
+      return next(new NotFoundError('Для данного пользователя нет сохраненных фильмов.'));
+    }
     return movies;
   }
   catch (err) {
-    if (err) {
-      return res.status(500).send({ message: 'Произошла ошибка' });
-    }
+    return next(new DefaultError('Ошибка по умолчанию.'));
   }
 };
 
 const postSavedMovie = async (req, res, next) => {
-  req.user = { _id: '6315f9eb574ba0a73bd77e09' };
   const {
     country,
     director,
@@ -38,7 +40,7 @@ const postSavedMovie = async (req, res, next) => {
     });
 
     if (isDublicateSavedMovie) {
-      return res.status(500).send({ message: 'Данный фильм уже сохранен' });
+      return next(new ValidationError('Данный фильм уже сохранен'));
     }
 
     const movie = await Movie.create({
@@ -58,9 +60,10 @@ const postSavedMovie = async (req, res, next) => {
     return res.send(movie);
   }
   catch (err) {
-    if (err) {
-      return res.status(500).send({ message: 'Произошла ошибка' });
+    if (err.name === 'ValidationError') {
+      return next(new ValidationError('Переданы некорректные данные при создании карточки.'));
     }
+    return next(new DefaultError('Ошибка по умолчанию.'));
   }
 };
 
@@ -68,14 +71,12 @@ const deleteSavedMovie = async (req, res, next) => {
   try {
     const movie = await Movie.findByIdAndRemove(req.params.id);
     if (!movie) {
-      return res.status(500).send({ message: 'Передан несуществующий id фильма.'});
+      return next(new NotFoundError('Передан несуществующий id фильма.'));
     }
     res.send(movie);
   }
   catch (err) {
-    if (err) {
-      return res.status(500).send({ message: 'Произошла ошибка' });
-    }
+    return next(new DefaultError('Ошибка по умолчанию.'));
   }
 };
 
