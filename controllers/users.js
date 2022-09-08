@@ -14,8 +14,7 @@ const getCurrentUser = async (req, res, next) => {
       return next(new NotFoundError('Пользователь по указанному _id не найден.'));
     }
     return res.send({ email: user.email, name: user.name });
-  }
-  catch (err) {
+  } catch (err) {
     return next(new DefaultError('Ошибка по умолчанию.'));
   }
 };
@@ -34,9 +33,8 @@ const postUser = async (req, res, next) => {
       name,
       password: hash,
     });
-    res.send(user);
-  }
-  catch (err) {
+    return res.send(user);
+  } catch (err) {
     if (err.name === 'ValidationError') {
       return next(new ValidationError('Переданы некорректные данные при создании пользователя.'));
     }
@@ -60,11 +58,10 @@ const patchCurrentUser = async (req, res, next) => {
       },
     );
     if (!user) {
-      return res.status(500).send({ message: 'Произошла ошибка' });
+      return next(new NotFoundError('Пользователь по указанному _id не найден.'));
     }
     return res.send({ email: user.email, name: user.name });
-  }
-  catch (err) {
+  } catch (err) {
     if (err.name === 'ValidationError') {
       return next(new ValidationError('Переданы некорректные данные при создании пользователя.'));
     }
@@ -80,23 +77,20 @@ const login = async (req, res, next) => {
     email,
     password,
   } = req.body;
-  let userId = null;
 
   try {
     const user = await User.findOne({ email }).select('+password');
     if (!user) {
       return next(new AuthError('Неправильные почта или пароль.'));
     }
-    userId = user._id;
     const matched = await bcrypt.compare(password, user.password);
     if (!matched) {
       return next(new AuthError('Неправильные почта или пароль.'));
     }
     const { NODE_ENV, JWT_SECRET } = process.env;
-    const token = jwt.sign({ _id: userId }, NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret', { expiresIn: '2h' });
+    const token = jwt.sign({ _id: user._id }, NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret', { expiresIn: '2h' });
     return res.send({ data: token });
-  }
-  catch(err) {
+  } catch (err) {
     return next(new DefaultError('Ошибка по умолчанию.'));
   }
 };

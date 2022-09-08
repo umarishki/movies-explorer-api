@@ -1,12 +1,11 @@
 const mongoose = require('mongoose');
-const validator = require('validator');
 const {
   regexUrl,
   regexRusLang,
   regexEngLang,
 } = require('../utils/utils');
 
-const movieSchema = module.exports = new mongoose.Schema({
+const movieSchema = new mongoose.Schema({
   country: {
     type: String,
     required: true,

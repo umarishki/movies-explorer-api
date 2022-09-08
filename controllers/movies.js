@@ -6,13 +6,11 @@ const ValidationError = require('../errors/validation-err');
 const getSavedMovies = async (req, res, next) => {
   try {
     const movies = await Movie.find({ owner: req.user._id });
-    res.send(movies);
     if (!movies) {
       return next(new NotFoundError('Для данного пользователя нет сохраненных фильмов.'));
     }
-    return movies;
-  }
-  catch (err) {
+    return res.send(movies);
+  } catch (err) {
     return next(new DefaultError('Ошибка по умолчанию.'));
   }
 };
@@ -35,10 +33,7 @@ const postSavedMovie = async (req, res, next) => {
   try {
     const savedMovies = await Movie.find({ owner: req.user._id });
 
-    const isDublicateSavedMovie = savedMovies.some((movie) => {
-      return (movie.movieId === movieId && String(movie.owner) === String(req.user._id));
-    });
-
+    const isDublicateSavedMovie = savedMovies.some((movie) => movie.movieId === movieId);
     if (isDublicateSavedMovie) {
       return next(new ValidationError('Данный фильм уже сохранен'));
     }
@@ -58,8 +53,7 @@ const postSavedMovie = async (req, res, next) => {
       nameEN,
     });
     return res.send(movie);
-  }
-  catch (err) {
+  } catch (err) {
     if (err.name === 'ValidationError') {
       return next(new ValidationError('Переданы некорректные данные при создании карточки.'));
     }
@@ -73,9 +67,8 @@ const deleteSavedMovie = async (req, res, next) => {
     if (!movie) {
       return next(new NotFoundError('Передан несуществующий id фильма.'));
     }
-    res.send(movie);
-  }
-  catch (err) {
+    return res.send(movie);
+  } catch (err) {
     return next(new DefaultError('Ошибка по умолчанию.'));
   }
 };
@@ -84,4 +77,4 @@ module.exports = {
   getSavedMovies,
   postSavedMovie,
   deleteSavedMovie,
-}
+};
