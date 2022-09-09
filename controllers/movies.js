@@ -2,6 +2,7 @@ const Movie = require('../models/movie');
 const NotFoundError = require('../errors/not-found-err');
 const DefaultError = require('../errors/default-err');
 const ValidationError = require('../errors/validation-err');
+const ForbiddenError = require('../errors/forbidden-err');
 
 const getSavedMovies = async (req, res, next) => {
   try {
@@ -63,10 +64,14 @@ const postSavedMovie = async (req, res, next) => {
 
 const deleteSavedMovie = async (req, res, next) => {
   try {
-    const movie = await Movie.findByIdAndRemove(req.params.id);
+    let movie = await Movie.findById(req.params.id);
     if (!movie) {
       return next(new NotFoundError('Передан несуществующий id фильма.'));
     }
+    if (!(String(movie.owner) === String(req.user._id))) {
+      return next(new ForbiddenError('Нельзя удалить фильм, сохраненный другим пользователем.'));
+    }
+    movie = await movie.remove();
     return res.send(movie);
   } catch (err) {
     return next(new DefaultError('Ошибка по умолчанию.'));
