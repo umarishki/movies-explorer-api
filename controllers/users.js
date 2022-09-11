@@ -33,7 +33,11 @@ const postUser = async (req, res, next) => {
       name,
       password: hash,
     });
-    return res.send(user);
+    return res.send({
+      email: user.email,
+      name: user.name,
+      _id: user._id,
+    });
   } catch (err) {
     if (err.name === 'ValidationError') {
       return next(new ValidationError('Переданы некорректные данные при создании пользователя.'));

@@ -56,7 +56,7 @@ const movieSchema = new mongoose.Schema({
     required: true,
   },
   movieId: {
-    type: String, // заменить на тип, соответсвующий полю в ответе сервиса MoviesExplorer
+    type: Number,
     required: true,
   },
   nameRU: {
