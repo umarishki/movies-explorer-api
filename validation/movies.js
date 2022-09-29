@@ -2,8 +2,6 @@ const { celebrate, Joi } = require('celebrate');
 const {
   regexUrl,
   regexHex,
-  regexRusLang,
-  regexEngLang,
 } = require('../utils/utils');
 
 const saveMovieValidation = celebrate({
@@ -17,8 +15,8 @@ const saveMovieValidation = celebrate({
     trailerLink: Joi.string().required().pattern(regexUrl),
     thumbnail: Joi.string().required().pattern(regexUrl),
     movieId: Joi.number().required(),
-    nameRU: Joi.string().required().pattern(regexRusLang),
-    nameEN: Joi.string().required().pattern(regexEngLang),
+    nameRU: Joi.string().required(),
+    nameEN: Joi.string().required(),
   }),
 });
 
