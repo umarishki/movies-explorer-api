@@ -1,8 +1,6 @@
 const mongoose = require('mongoose');
 const {
   regexUrl,
-  regexRusLang,
-  regexEngLang,
 } = require('../utils/utils');
 
 const movieSchema = new mongoose.Schema({
@@ -62,18 +60,10 @@ const movieSchema = new mongoose.Schema({
   nameRU: {
     type: String,
     required: true,
-    validate: {
-      validator: (v) => regexRusLang.test(v),
-      message: 'Неверный формат: наименование должно содержать только русский алфавит',
-    },
   },
   nameEN: {
     type: String,
     required: true,
-    validate: {
-      validator: (v) => regexEngLang.test(v),
-      message: 'Неверный формат: наименование должно содержать только латинский алфавит',
-    },
   },
 });
 
