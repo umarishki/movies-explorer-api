@@ -2,8 +2,8 @@ module.exports = (req, res, next) => {
   const allowedCors = [
     'http://localhost:3000',
     'http://localhost:3001',
-    'http://umarishki.diploma.nomorepartiesxyz.ru/',
-    'https://umarishki.diploma.nomorepartiesxyz.ru/',
+    'http://umarishki.diploma.nomorepartiesxyz.ru',
+    'https://umarishki.diploma.nomorepartiesxyz.ru',
   ];
   const DEFAULT_ALLOWED_METHODS = 'GET,HEAD,PUT,PATCH,POST,DELETE';
 
